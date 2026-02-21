@@ -5,12 +5,13 @@ import Experience from "@/components/portfolio/experience"
 import Education from "@/components/portfolio/education"
 import Projects from "@/components/portfolio/projects"
 import Contact from "@/components/portfolio/contact"
+import Footer from "@/components/portfolio/footer"
 import Background from "@/components/portfolio/background"
 import CustomCursor from "@/components/portfolio/custom-cursor"
 
 export default function HomePage() {
   return (
-    <main className="flex flex-col gap-24">
+    <main className="flex flex-col gap-24 bg-black">
       <Hero />
       <About />
       <Skills />
@@ -18,7 +19,7 @@ export default function HomePage() {
       <Education />
       <Projects />
       <Contact />
-      <Background />
+      <Footer />
       <CustomCursor />
     </main>
   )
