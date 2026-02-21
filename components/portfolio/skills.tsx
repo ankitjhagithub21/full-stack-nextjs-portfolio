@@ -1,35 +1,21 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 
 interface Skill {
   _id: string
   name: string
-  level?: string
-  category?: string
+  level: number
+  category: string
+  icon?: string
+  order: number
 }
 
-export default function Skills() {
-  const [skills, setSkills] = useState<Skill[]>([])
-  const [loading, setLoading] = useState(true)
+interface SkillsProps {
+  data: Skill[]
+}
 
-  useEffect(() => {
-    const fetchSkills = async () => {
-      try {
-        const res = await fetch("/api/skills")
-        const data = await res.json()
-        setSkills(data.skills || [])
-      } catch (error) {
-        console.error("Failed to fetch skills")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchSkills()
-  }, [])
-
+export default function Skills({ data }: SkillsProps) {
   return (
     <section id="skills" className="py-24 px-6 relative">
       <div className="max-w-6xl mx-auto space-y-16">
@@ -45,15 +31,9 @@ export default function Skills() {
           Skills & Technologies
         </motion.h2>
 
-        {loading && (
-          <p className="text-center text-gray-400">
-            Loading skills...
-          </p>
-        )}
-
         {/* Skills Grid */}
         <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {skills.map((skill, index) => (
+          {data.map((skill, index) => (
             <motion.div
               key={skill._id}
               initial={{ opacity: 0, y: 50 }}
@@ -71,17 +51,26 @@ export default function Skills() {
                   {skill.name}
                 </h3>
 
-                {skill.category && (
-                  <p className="text-sm text-gray-400">
-                    {skill.category}
-                  </p>
-                )}
+                <p className="text-sm text-gray-400">
+                  {skill.category}
+                </p>
 
-                {skill.level && (
-                  <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white">
-                    {skill.level}
-                  </span>
-                )}
+                {/* Skill Level Bar */}
+                <div className="mt-3">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-xs text-gray-400">Proficiency</span>
+                    <span className="text-xs text-purple-400">{skill.level}%</span>
+                  </div>
+                  <div className="w-full bg-white/10 rounded-full h-2">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${skill.level}%` }}
+                      transition={{ duration: 1, delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                      className="h-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
+                    />
+                  </div>
+                </div>
               </div>
             </motion.div>
           ))}

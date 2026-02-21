@@ -1,37 +1,23 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 
 interface Experience {
   _id: string
   company: string
-  role: string
+  position: string
+  description: string
   startDate: string
   endDate?: string
-  description?: string
+  currentlyWorking: boolean
+  location?: string
 }
 
-export default function Experience() {
-  const [experiences, setExperiences] = useState<Experience[]>([])
-  const [loading, setLoading] = useState(true)
+interface ExperienceProps {
+  data: Experience[]
+}
 
-  useEffect(() => {
-    const fetchExperience = async () => {
-      try {
-        const res = await fetch("/api/experience")
-        const data = await res.json()
-        setExperiences(data.experiences || [])
-      } catch (error) {
-        console.error("Failed to load experience")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchExperience()
-  }, [])
-
+export default function Experience({ data }: ExperienceProps) {
   return (
     <section id="experience" className="py-24 px-6 relative">
       <div className="max-w-5xl mx-auto space-y-16">
@@ -47,12 +33,6 @@ export default function Experience() {
           Experience Timeline
         </motion.h2>
 
-        {loading && (
-          <p className="text-center text-gray-400">
-            Loading experience...
-          </p>
-        )}
-
         {/* Timeline Container */}
         <div className="relative">
 
@@ -60,7 +40,7 @@ export default function Experience() {
           <div className="absolute left-1/2 top-0 w-1 h-full bg-gradient-to-b from-purple-500 via-blue-500 to-pink-500 transform -translate-x-1/2 rounded-full" />
 
           <div className="space-y-16">
-            {experiences.map((exp, index) => {
+            {data.map((exp, index) => {
               const isLeft = index % 2 === 0
 
               return (
@@ -82,7 +62,7 @@ export default function Experience() {
                   {/* Card */}
                   <div className="w-full md:w-5/12 p-6 rounded-2xl backdrop-blur-xl bg-white/5 border border-white/10 shadow-xl">
                     <h3 className="text-xl font-semibold text-white">
-                      {exp.role}
+                      {exp.position}
                     </h3>
 
                     <p className="text-purple-400 font-medium">
@@ -90,14 +70,24 @@ export default function Experience() {
                     </p>
 
                     <p className="text-sm text-gray-400 mt-1">
-                      {new Date(exp.startDate).toLocaleDateString()}{" "}
+                      {new Date(exp.startDate).toLocaleDateString("en-US", { 
+                        year: 'numeric', 
+                        month: 'short' 
+                      })}{" "}
                       -{" "}
-                      {exp.endDate
-                        ? new Date(
-                            exp.endDate
-                          ).toLocaleDateString()
-                        : "Present"}
+                      {exp.currentlyWorking
+                        ? "Present"
+                        : new Date(exp.endDate!).toLocaleDateString("en-US", { 
+                            year: 'numeric', 
+                            month: 'short' 
+                          })}
                     </p>
+
+                    {exp.location && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        📍 {exp.location}
+                      </p>
+                    )}
 
                     {exp.description && (
                       <p className="text-gray-400 mt-4 text-sm leading-relaxed">

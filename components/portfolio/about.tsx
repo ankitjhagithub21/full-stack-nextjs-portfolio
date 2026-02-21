@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import Image from "next/image"
 
@@ -11,6 +10,7 @@ interface About {
   description: string
   profileImage?: {
     url: string
+    public_id: string
   }
   resumeUrl?: string
   yearsExperience: number
@@ -18,37 +18,12 @@ interface About {
   skills: string[]
 }
 
-export default function About() {
-  const [about, setAbout] = useState<About | null>(null)
-  const [loading, setLoading] = useState(true)
+interface AboutProps {
+  data: About | null
+}
 
-  useEffect(() => {
-    const fetchAbout = async () => {
-      try {
-        const res = await fetch("/api/about")
-        const data = await res.json()
-        setAbout(data.about)
-      } catch (error) {
-        console.error("Failed to load about information")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchAbout()
-  }, [])
-
-  if (loading) {
-    return (
-      <section id="about" className="py-24 px-6 relative">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-gray-400">Loading about information...</p>
-        </div>
-      </section>
-    )
-  }
-
-  if (!about) {
+export default function About({ data }: AboutProps) {
+  if (!data) {
     return (
       <section id="about" className="py-24 px-6 relative">
         <div className="max-w-6xl mx-auto text-center">
@@ -75,7 +50,7 @@ export default function About() {
 
           <div className="relative rounded-3xl overflow-hidden border border-white/10 backdrop-blur-xl bg-white/5">
             <Image
-              src={about.profileImage?.url || "/profile.jpg"}
+              src={data.profileImage?.url || "/profile.jpg"}
               alt="Profile"
               width={500}
               height={600}
@@ -93,11 +68,11 @@ export default function About() {
           className="space-y-8"
         >
           <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            {about.title}
+            {data.title}
           </h2>
 
           <p className="text-gray-400 leading-relaxed">
-            {about.description}
+            {data.description}
           </p>
 
           {/* Stats */}
@@ -106,7 +81,7 @@ export default function About() {
               whileHover={{ scale: 1.05 }}
               className="p-6 rounded-2xl backdrop-blur-xl bg-white/5 border border-white/10 text-center"
             >
-              <h3 className="text-3xl font-bold text-purple-400">{about.yearsExperience}+</h3>
+              <h3 className="text-3xl font-bold text-purple-400">{data.yearsExperience}+</h3>
               <p className="text-gray-400 text-sm mt-2">
                 Years Experience
               </p>
@@ -116,7 +91,7 @@ export default function About() {
               whileHover={{ scale: 1.05 }}
               className="p-6 rounded-2xl backdrop-blur-xl bg-white/5 border border-white/10 text-center"
             >
-              <h3 className="text-3xl font-bold text-pink-400">{about.projectsCompleted}+</h3>
+              <h3 className="text-3xl font-bold text-pink-400">{data.projectsCompleted}+</h3>
               <p className="text-gray-400 text-sm mt-2">
                 Projects Completed
               </p>
@@ -127,7 +102,7 @@ export default function About() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-white">Key Skills</h3>
             <div className="flex flex-wrap gap-2">
-              {about.skills.map((skill, index) => (
+              {data.skills.map((skill, index) => (
                 <span
                   key={index}
                   className="px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-300 rounded-full text-sm border border-purple-500/30"
@@ -139,9 +114,9 @@ export default function About() {
           </div>
 
           {/* Resume Button */}
-          {about.resumeUrl && (
+          {data.resumeUrl && (
             <motion.a
-              href={about.resumeUrl}
+              href={data.resumeUrl}
               target="_blank"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

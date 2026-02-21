@@ -1,37 +1,23 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 
 interface Education {
   _id: string
-  degree: string
   institution: string
+  degree: string
+  field: string
   startDate: string
   endDate?: string
+  currentlyStudying?: boolean
   description?: string
 }
 
-export default function Education() {
-  const [education, setEducation] = useState<Education[]>([])
-  const [loading, setLoading] = useState(true)
+interface EducationProps {
+  data: Education[]
+}
 
-  useEffect(() => {
-    const fetchEducation = async () => {
-      try {
-        const res = await fetch("/api/education")
-        const data = await res.json()
-        setEducation(data.education || [])
-      } catch (error) {
-        console.error("Failed to load education")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchEducation()
-  }, [])
-
+export default function Education({ data }: EducationProps) {
   return (
     <section id="education" className="py-24 px-6 relative">
       <div className="max-w-6xl mx-auto space-y-16">
@@ -47,15 +33,9 @@ export default function Education() {
           Education
         </motion.h2>
 
-        {loading && (
-          <p className="text-center text-gray-400">
-            Loading education...
-          </p>
-        )}
-
         {/* Cards Grid */}
         <div className="grid md:grid-cols-2 gap-10">
-          {education.map((edu, index) => (
+          {data.map((edu, index) => (
             <motion.div
               key={edu._id}
               initial={{ opacity: 0, y: 60 }}
@@ -77,12 +57,24 @@ export default function Education() {
                   {edu.institution}
                 </p>
 
+                {edu.field && (
+                  <p className="text-sm text-gray-400 mt-1">
+                    {edu.field}
+                  </p>
+                )}
+
                 <p className="text-sm text-gray-400 mt-2">
-                  {new Date(edu.startDate).toLocaleDateString()}{" "}
+                  {new Date(edu.startDate).toLocaleDateString("en-US", { 
+                    year: 'numeric', 
+                    month: 'short' 
+                  })}{" "}
                   -{" "}
-                  {edu.endDate
-                    ? new Date(edu.endDate).toLocaleDateString()
-                    : "Present"}
+                  {edu.currentlyStudying
+                    ? "Present"
+                    : new Date(edu.endDate!).toLocaleDateString("en-US", { 
+                        year: 'numeric', 
+                        month: 'short' 
+                      })}
                 </p>
 
                 {edu.description && (

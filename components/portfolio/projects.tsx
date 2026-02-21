@@ -1,40 +1,26 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { ExternalLink } from "lucide-react"
+import { ExternalLink, Github } from "lucide-react"
 
 interface Project {
   _id: string
   title: string
   description: string
-  image:{
-    url:string
+  githubUrl?: string
+  liveUrl?: string
+  image: {
+    url: string
+    public_id: string
   }
-  category: string
 }
 
-export default function Projects() {
-  const [projects, setProjects] = useState<Project[]>([])
-  const [loading, setLoading] = useState(true)
+interface ProjectsProps {
+  data: Project[]
+}
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const res = await fetch("/api/projects")
-        const data = await res.json()
-        setProjects(data.projects || [])
-      } catch (error) {
-        console.error("Failed to load projects")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchProjects()
-  }, [])
-
+export default function Projects({ data }: ProjectsProps) {
   return (
     <section
       id="projects"
@@ -53,16 +39,9 @@ export default function Projects() {
           Featured Projects
         </motion.h2>
 
-        {/* Loading */}
-        {loading && (
-          <p className="text-center text-gray-400">
-            Loading projects...
-          </p>
-        )}
-
         {/* Projects Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {projects.map((project, index) => (
+          {data.map((project, index) => (
             <motion.div
               key={project._id}
               initial={{ opacity: 0, y: 60 }}
@@ -82,8 +61,27 @@ export default function Projects() {
                 />
 
                 {/* Overlay */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition duration-500 flex items-center justify-center">
-                  <ExternalLink className="text-white w-8 h-8" />
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition duration-500 flex items-center justify-center gap-4">
+                  {project.liveUrl && (
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 bg-white/10 rounded-full backdrop-blur-sm hover:bg-white/20 transition"
+                    >
+                      <ExternalLink className="text-white w-5 h-5" />
+                    </a>
+                  )}
+                  {project.githubUrl && (
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 bg-white/10 rounded-full backdrop-blur-sm hover:bg-white/20 transition"
+                    >
+                      <Github className="text-white w-5 h-5" />
+                    </a>
+                  )}
                 </div>
               </div>
 
@@ -97,9 +95,31 @@ export default function Projects() {
                   {project.description}
                 </p>
 
-                <span className="text-xs text-purple-400 uppercase tracking-wider">
-                  {project.category}
-                </span>
+                {/* Action Links */}
+                <div className="flex gap-3 pt-2">
+                  {project.liveUrl && (
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 transition"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Live Demo
+                    </a>
+                  )}
+                  {project.githubUrl && (
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 transition"
+                    >
+                      <Github className="w-4 h-4" />
+                      Code
+                    </a>
+                  )}
+                </div>
               </div>
             </motion.div>
           ))}
